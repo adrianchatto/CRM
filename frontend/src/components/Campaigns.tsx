@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import CampaignContactList from './CampaignContactList'
+import CampaignOverview from './CampaignOverview'
 
 interface Campaign {
   id: number
@@ -22,7 +23,7 @@ interface CampaignDetails extends Campaign {
   }
 }
 
-type ViewMode = 'list' | 'details' | 'contacts'
+type ViewMode = 'list' | 'details' | 'contacts' | 'overview'
 
 export default function Campaigns() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
@@ -76,8 +77,16 @@ export default function Campaigns() {
     setViewMode('details')
   }
 
+  const handleViewOverview = () => {
+    setViewMode('overview')
+  }
+
   if (loading) {
     return <div className="text-center py-8">Loading campaigns...</div>
+  }
+
+  if (viewMode === 'overview') {
+    return <CampaignOverview onBack={handleBackToList} />
   }
 
   if (viewMode === 'contacts' && selectedCampaign) {
@@ -217,11 +226,22 @@ export default function Campaigns() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-gray-900">Campaigns</h2>
-        <p className="mt-2 text-sm text-gray-700">
-          Track your marketing campaigns and measure their effectiveness.
-        </p>
+      <div className="mb-6 flex justify-between items-start">
+        <div>
+          <h2 className="text-2xl font-semibold text-gray-900">Campaigns</h2>
+          <p className="mt-2 text-sm text-gray-700">
+            Track your marketing campaigns and measure their effectiveness.
+          </p>
+        </div>
+        <button
+          onClick={handleViewOverview}
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium flex items-center"
+        >
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          Campaign Overview
+        </button>
       </div>
 
       {campaigns.length === 0 ? (

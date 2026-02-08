@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import CustomerProductsSection from './CustomerProductsSection'
 
 interface LinkedPerson {
   relationship_id: number
@@ -318,6 +319,11 @@ export default function OrganisationDetail({ orgId, onBack }: OrganisationDetail
             </tbody>
           </table>
         )}
+      </div>
+
+      {/* Products & Services Section */}
+      <div className="mt-6">
+        <CustomerProductsSection contactId={orgId} />
       </div>
     </div>
   )

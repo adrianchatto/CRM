@@ -4,6 +4,7 @@ import ContactForm from './components/ContactForm'
 import Dashboard from './components/Dashboard'
 import Campaigns from './components/Campaigns'
 import CompaniesEstates from './components/CompaniesEstates'
+import ProductList from './components/ProductList'
 
 export interface Contact {
   id?: number
@@ -20,7 +21,7 @@ function App() {
   const [contacts, setContacts] = useState<Contact[]>([])
   const [editingContact, setEditingContact] = useState<Contact | null>(null)
   const [showForm, setShowForm] = useState(false)
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'contacts' | 'campaigns' | 'organisations'>('dashboard')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'contacts' | 'campaigns' | 'organisations' | 'products'>('dashboard')
 
   useEffect(() => {
     fetchContacts()
@@ -151,6 +152,16 @@ function App() {
             >
               Companies & Estates
             </button>
+            <button
+              onClick={() => setActiveTab('products')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'products'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              Products
+            </button>
           </nav>
         </div>
       </div>
@@ -186,6 +197,10 @@ function App() {
 
         {activeTab === 'organisations' && (
           <CompaniesEstates />
+        )}
+
+        {activeTab === 'products' && (
+          <ProductList />
         )}
       </main>
     </div>

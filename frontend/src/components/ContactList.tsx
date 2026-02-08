@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Contact } from '../App'
 
 interface ContactListProps {
@@ -8,6 +9,8 @@ interface ContactListProps {
 }
 
 export default function ContactList({ contacts, onEdit, onDelete, onNew }: ContactListProps) {
+  const [searchQuery, setSearchQuery] = useState('')
+
   const getContactTypeBadge = (type: string) => {
     const colors = {
       individual: 'bg-blue-100 text-blue-800',
@@ -16,6 +19,20 @@ export default function ContactList({ contacts, onEdit, onDelete, onNew }: Conta
     }
     return colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800'
   }
+
+  // Filter contacts based on search query
+  const filteredContacts = contacts.filter(contact => {
+    if (!searchQuery) return true
+
+    const query = searchQuery.toLowerCase()
+    return (
+      contact.full_name.toLowerCase().includes(query) ||
+      (contact.email && contact.email.toLowerCase().includes(query)) ||
+      (contact.phone && contact.phone.toLowerCase().includes(query)) ||
+      (contact.company_name && contact.company_name.toLowerCase().includes(query)) ||
+      contact.contact_type.toLowerCase().includes(query)
+    )
+  })
 
   return (
     <div>
@@ -42,6 +59,47 @@ export default function ContactList({ contacts, onEdit, onDelete, onNew }: Conta
             Add Contact
           </button>
         </div>
+      </div>
+
+      {/* Search Bar */}
+      <div className="mb-4">
+        <div className="relative">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search contacts by name, email, phone, or company..."
+            className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <svg
+            className="absolute left-3 top-2.5 w-5 h-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          )}
+        </div>
+        {searchQuery && (
+          <p className="mt-2 text-sm text-gray-600">
+            Found {filteredContacts.length} contact{filteredContacts.length !== 1 ? 's' : ''} matching "{searchQuery}"
+          </p>
+        )}
       </div>
 
       {contacts.length === 0 ? (
@@ -75,6 +133,32 @@ export default function ContactList({ contacts, onEdit, onDelete, onNew }: Conta
             </button>
           </div>
         </div>
+      ) : filteredContacts.length === 0 ? (
+        <div className="text-center py-12 bg-white rounded-lg border border-gray-300">
+          <svg
+            className="mx-auto h-12 w-12 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <h3 className="mt-2 text-sm font-semibold text-gray-900">No contacts found</h3>
+          <p className="mt-1 text-sm text-gray-500">
+            Try adjusting your search to find what you're looking for.
+          </p>
+          <button
+            onClick={() => setSearchQuery('')}
+            className="mt-4 inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+          >
+            Clear search
+          </button>
+        </div>
       ) : (
         <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
           <table className="min-w-full divide-y divide-gray-300">
@@ -98,7 +182,7 @@ export default function ContactList({ contacts, onEdit, onDelete, onNew }: Conta
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {contacts.map((contact) => (
+              {filteredContacts.map((contact) => (
                 <tr key={contact.id}>
                   <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
                     <div className="font-medium text-gray-900">{contact.full_name}</div>
